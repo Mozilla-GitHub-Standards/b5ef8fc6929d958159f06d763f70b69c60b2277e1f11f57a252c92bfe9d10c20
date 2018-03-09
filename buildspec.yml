@@ -2,5 +2,13 @@ version: 0.2
 phases:
   build:
     commands:
+      - echo "========== Validate Apache configuration =========="
       - docker build -t redirector .
       - docker run redirector apachectl configtest
+      - echo "========== Check Observatory score =========="
+      - docker run -p 8080:80 -d redirector
+      - git clone https://github.com/mozilla/http-observatory.git
+      - cd http-observatory/
+      - pip install --upgrade .
+      - pip install --upgrade -r requirements.txt
+      - httpobs-local-scan localhost:8080
